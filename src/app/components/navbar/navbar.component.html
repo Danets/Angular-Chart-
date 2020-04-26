@@ -6,8 +6,36 @@
 <mat-form-field>
   <mat-label>Controls</mat-label>
   <mat-select [value]="selected">
-    <mat-option *ngFor="let ctrl of controls" [value]="ctrl" >
+    <mat-option *ngFor="let ctrl of controls" [value]="ctrl">
       {{ ctrl }}
     </mat-option>
   </mat-select>
 </mat-form-field>
+
+<input
+  type="file"
+  name="files"
+  class="form-control"
+  #uploads
+  (change)="onChange(uploads.files)"
+  multiple
+/>
+
+<div>
+  <table border="">
+    <thead>
+      <tr>
+        <th>markdown</th>
+        <th>revenues</th>
+        <th>margin</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let record of dataList">
+        <td>{{ record.markdown }}</td>
+        <td>{{ record.revenues }}</td>
+        <td>{{ record.margin }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
