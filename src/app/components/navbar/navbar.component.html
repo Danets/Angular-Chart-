@@ -4,8 +4,8 @@
 </mat-toolbar>
 
 <mat-form-field>
-  <mat-label>Controls</mat-label>
-  <mat-select [value]="selected">
+  <mat-label>Select Control</mat-label>
+  <mat-select [value]="selected$ | async" (selectionChange)="changeOption($event.value)">
     <mat-option *ngFor="let ctrl of controls" [value]="ctrl">
       {{ ctrl }}
     </mat-option>
@@ -21,7 +21,7 @@
   multiple
 />
 
-<div>
+<!-- <div>
   <table border="">
     <thead>
       <tr>
@@ -38,4 +38,4 @@
       </tr>
     </tbody>
   </table>
-</div>
+</div> -->
