@@ -7,20 +7,20 @@ import { IDataChart } from "./models/data-chart";
 })
 export class DataService {
 
-sourceData = new BehaviorSubject([]);
-dataChart$: Observable<IDataChart[]> = this.sourceData.asObservable();
+dataSubject: BehaviorSubject<IDataChart[]> = new BehaviorSubject([]);
+dataChart$: Observable<IDataChart[]> = this.dataSubject.asObservable();
 
-selectedData = new BehaviorSubject("markdown");
-selectedControl$: Observable<string> = this.selectedData.asObservable();
+selectedSubject: BehaviorSubject<string> = new BehaviorSubject("markdown");
+selectedControl$: Observable<string> = this.selectedSubject.asObservable();
 
 constructor() { }
 
 selectControl(control: string): void {
-  this.selectedData.next(control);
+  this.selectedSubject.next(control);
 }  
 
 setData(data: IDataChart[]): void {
-  this.sourceData.next(data);
+  this.dataSubject.next(data);
 }  
 
 }
