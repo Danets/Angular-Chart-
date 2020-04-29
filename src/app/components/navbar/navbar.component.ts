@@ -30,27 +30,26 @@ export class NavbarComponent implements OnInit {
         header: true,
         skipEmptyLines: true,
         complete: (result) => {
-          console.log(result);
-          // this.dataList = result.data.slice(0, 10);
-          this.dataService.setData(result.data);
-          // this.dataService.dataChart$.pipe(
-          //   map(data => {
-          //     console.log(data);
-          //   })
-          // )
-          // .subscribe(data => this.dataList = data);
-          // console.log(`DataList: ${this.dataList}`);
+          // console.log(result);
+          const parsedData = result.data.map(obj => ({
+            ...obj,
+            date: new Date(+obj.year_ref, 0, +obj.week_ref),
+            // new Date(year, month, date, hours, minutes, seconds, ms)
+          }))
+          this.dataService.setData(parsedData);
         }
       });
     }
-    // if(files[0]) {
-    //   this.dataService.setData(files);
-    // }
+   
   }
 
   changeOption(value: string)  {
     this.dataService.selectControl(value);
     console.log(value);
+  }
+
+  resetAll() {
+    this.dataService.resetFilters();
   }
 
 }

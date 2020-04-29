@@ -20,4 +20,5 @@ export interface IDataChart {
   valuta: string;
   week_ref: number;
   year_ref: number;
+  date: Date;
 }
