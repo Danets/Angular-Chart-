@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  AfterContentInit,
   AfterViewInit,
   OnDestroy,
   ViewChild,
@@ -9,6 +10,8 @@ import {
 import { DataService } from "../../data.service";
 import { Observable } from "rxjs";
 import { IDataChart } from "../../models/data-chart";
+
+// import { timer } from 'rxjs/operators';
 
 import { SubSink } from "subsink";
 
@@ -22,27 +25,29 @@ import crossfilter from "crossfilter2/crossfilter";
   templateUrl: "./pie-chart.component.html",
   styleUrls: ["./pie-chart.component.scss"],
 })
-export class PieChartComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PieChartComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {
   @ViewChild("pie") pie: ElementRef;
-  pieChart: PieChart;
+  private pieChart: PieChart;
   // data$: Observable<IDataChart[]>;
   data: IDataChart[] = [];
   crossFilter = crossfilter();
 
-  selected$: Observable<string>;
+  // selected$: Observable<string>;
+
+  selectedCategories = [];
 
   private subs = new SubSink();
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) {
+    this.initData();
+  }
 
   ngOnInit(): void {
     // this.data$ = this.dataService.dataChart$;
-    this.selected$ = this.dataService.selectedControl$;
-    this.subs.sink = this.dataService.dataChart$.subscribe((data) => {
-      this.data = data;
-      console.log(this.data);
-    });
-    // this.crossFilter.add(this.data);
+    // this.selected$ = this.dataService.selectedControl$;
+  }
+
+  ngAfterContentInit() {
   }
 
   ngAfterViewInit(): void {
@@ -60,17 +65,33 @@ export class PieChartComponent implements OnInit, AfterViewInit, OnDestroy {
       const categoryDimension = crossFilter.dimension(
         (data) => data.item_category
       );
+      categoryDimension.filter(data => data.country)
       const categoryGroupSum = categoryDimension
         .group()
         .reduceSum((data) => data.markdown);
 
       this.pieChart
-        .width(800)
-        .height(300)
+        .width(500)
+        .height(400)
         .dimension(categoryDimension)
+        // .title(function(d){return d.country;})
+        // .filter(function(){})
         .group(categoryGroupSum)
         .legend(dc.legend())
+      //   .on('filtered', function(chart) {
+      //     chart.filter(null)
+      //         .filter([chart.filters()])
+      //         .redrawGroup();
+      // })
         .render();
+
+  }
+
+  initData() {
+    this.subs.sink = this.dataService.dataChart$.subscribe((data) => {
+      this.data = data;
+      // console.log(this.data);
+    });
   }
 
   changeFilter() {

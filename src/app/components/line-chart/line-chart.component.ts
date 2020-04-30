@@ -2,6 +2,7 @@ import {
   Component,
   OnInit,
   AfterViewInit,
+  AfterContentInit,
   OnDestroy,
   ViewChild,
   ElementRef,
@@ -22,25 +23,26 @@ import crossfilter from "crossfilter2/crossfilter";
   templateUrl: "./line-chart.component.html",
   styleUrls: ["./line-chart.component.scss"],
 })
-export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LineChartComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {
   @ViewChild("line") line: ElementRef;
-  lineChart: LineChart;
+  private lineChart: LineChart;
 
   data: IDataChart[] = [];
-  crossFilter = crossfilter(this.data);
+  // crossFilter = crossfilter();
 
-  selected$: Observable<string>;
+  // selected$: Observable<string>;
 
   private subs = new SubSink();
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
-    this.selected$ = this.dataService.selectedControl$;
-    this.subs.sink = this.dataService.dataChart$.subscribe((data) => {
-      this.data = data;
-      console.log(this.data);
-    });
+    // this.selected$ = this.dataService.selectedControl$;
+    
+  }
+
+  ngAfterContentInit() {
+    this.initData();
   }
 
   ngAfterViewInit(): void {
@@ -56,25 +58,33 @@ export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.lineChart = dc.lineChart(this.line.nativeElement);
       const crossFilter = crossfilter(this.data);
       const categoryDimension = crossFilter.dimension((data) =>
-        d3.timeWeek(data.date)
+      // d3.timeWeek(data.date)
+      data.date
       );
       const categoryGroupSum = categoryDimension
         .group()
         .reduceSum((data) => data.markdown);
 
       this.lineChart
-        .width(1000)
+        .width(500)
         .height(400)
-        .margins({ top: 10, right: 10, bottom: 20, left: 40 })
+        .margins({ top: 10, right: 10, bottom: 20, left: 100 })
         .dimension(categoryDimension)
         .group(categoryGroupSum)
         .transitionDuration(500)
         .elasticY(true)
         .x(d3.scaleTime())
         .elasticX(true)
-        .xUnits(d3.timeWeeks)
+        // .xUnits(d3.timeWeeks)
         .render();
     }
+  }
+
+  initData() {
+    this.subs.sink = this.dataService.dataChart$.subscribe((data) => {
+      this.data = data;
+      // console.log(this.data);
+    });
   }
 
   changeFilter() {

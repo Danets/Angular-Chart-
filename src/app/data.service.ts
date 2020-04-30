@@ -2,15 +2,18 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IDataChart } from "./models/data-chart";
 
+import * as dc from "dc";
+import * as d3 from "d3";
+import { PieChart, LineChart } from "dc";
 import crossfilter from "crossfilter2/crossfilter";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-
   crossFilter = crossfilter();
 
+sorceData: IDataChart[] = [];
 
 dataSubject: BehaviorSubject<IDataChart[]> = new BehaviorSubject([]);
 dataChart$: Observable<IDataChart[]> = this.dataSubject.asObservable();
@@ -32,7 +35,9 @@ setData(data: IDataChart[]): void {
 
 initData() {
   this.dataChart$.subscribe(data => {
-    this.crossFilter.add(data)
+    this.crossFilter.remove();
+    this.crossFilter.add(data);
+    dc.redrawAll();
   })
 }
 

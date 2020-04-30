@@ -4,6 +4,7 @@ import { DataService } from "../../data.service";
 import { Observable } from 'rxjs';
 import { IDataChart } from "../../models/data-chart";
 import { map } from 'rxjs/operators';
+import crossfilter from "crossfilter2/crossfilter";
 
 @Component({
   selector: 'app-navbar',
@@ -36,7 +37,11 @@ export class NavbarComponent implements OnInit {
             date: new Date(+obj.year_ref, 0, +obj.week_ref),
             // new Date(year, month, date, hours, minutes, seconds, ms)
           }))
-          this.dataService.setData(parsedData);
+            this.dataService.setData(parsedData);
+            setTimeout(() => {
+              this.dataService.initData();
+              console.log('Data init')
+            }, 5000)
         }
       });
     }
