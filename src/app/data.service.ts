@@ -1,48 +1,56 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
 import { IDataChart } from "./models/data-chart";
 
 import * as dc from "dc";
 import * as d3 from "d3";
-import { PieChart, LineChart } from "dc";
 import crossfilter from "crossfilter2/crossfilter";
+import { Crossfilter } from "crossfilter2";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class DataService {
-  crossFilter = crossfilter();
+  private crossFilter: Crossfilter<IDataChart> = crossfilter();
+  pieDimension = this.crossFilter.dimension((data) => data.item_category);
+  pieGroupSum = this.pieDimension.group().reduceSum((data) => data.markdown);
+  lineDimension = this.crossFilter.dimension((data) => d3.timeWeek(data.date));
+  lineGroupSum = this.lineDimension.group().reduceSum((data) => data.markdown);
 
-sorceData: IDataChart[] = [];
+  /**
+   *  HERE IS DATA
+   */
 
-dataSubject: BehaviorSubject<IDataChart[]> = new BehaviorSubject([]);
-dataChart$: Observable<IDataChart[]> = this.dataSubject.asObservable();
+  dataSubject: BehaviorSubject<IDataChart[]> = new BehaviorSubject([]);
+  dataChart$: Observable<IDataChart[]> = this.dataSubject.asObservable();
 
-selectedSubject: BehaviorSubject<string> = new BehaviorSubject("markdown");
-selectedControl$: Observable<string> = this.selectedSubject.asObservable();
+  setData(data: IDataChart[]): void {
+    this.dataSubject.next(data);
+  }
 
-constructor() { 
-  this.initData();
-}
+  selectedSubject: BehaviorSubject<string> = new BehaviorSubject("markdown");
+  selectedControl$: Observable<string> = this.selectedSubject.asObservable();
 
-selectControl(control: string): void {
-  this.selectedSubject.next(control);
-}  
+  selectControl(control: string): void {
+    this.selectedSubject.next(control);
+  }
 
-setData(data: IDataChart[]): void {
-  this.dataSubject.next(data);
-}
+  constructor() {
+    this.initData();
+  }
 
-initData() {
-  this.dataChart$.subscribe(data => {
-    this.crossFilter.remove();
-    this.crossFilter.add(data);
+  initData() {
+    this.dataChart$.subscribe((data) => {
+      this.resetFilters();
+      this.crossFilter.remove();
+      this.crossFilter.add(data);
+    });
+  }
+
+  resetFilters() {
+    this.pieDimension.filterAll();
+    this.lineDimension.filterAll();
+    dc.filterAll();
     dc.redrawAll();
-  })
-}
-
-resetFilters() {
-  this.selectedSubject.next("");
-}
-
+  }
 }

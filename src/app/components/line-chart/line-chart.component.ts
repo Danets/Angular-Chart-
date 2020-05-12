@@ -1,14 +1,11 @@
 import {
   Component,
-  OnInit,
   AfterViewInit,
-  AfterContentInit,
   OnDestroy,
   ViewChild,
   ElementRef,
 } from "@angular/core";
 import { DataService } from "../../data.service";
-import { Observable } from "rxjs";
 import { IDataChart } from "../../models/data-chart";
 
 import { SubSink } from "subsink";
@@ -16,54 +13,34 @@ import { SubSink } from "subsink";
 import * as dc from "dc";
 import * as d3 from "d3";
 import { LineChart } from "dc";
-import crossfilter from "crossfilter2/crossfilter";
 
 @Component({
   selector: "app-line-chart",
   templateUrl: "./line-chart.component.html",
   styleUrls: ["./line-chart.component.scss"],
 })
-export class LineChartComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {
+export class LineChartComponent implements AfterViewInit, OnDestroy {
   @ViewChild("line") line: ElementRef;
   private lineChart: LineChart;
-
-  data: IDataChart[] = [];
-  // crossFilter = crossfilter();
-
-  // selected$: Observable<string>;
 
   private subs = new SubSink();
 
   constructor(private dataService: DataService) {}
-
-  ngOnInit(): void {
-    // this.selected$ = this.dataService.selectedControl$;
-    
-  }
-
-  ngAfterContentInit() {
-    this.initData();
-  }
-
+  
   ngAfterViewInit(): void {
     this.initLineChart();
+    this.initData();
     this.changeFilter();
   }
 
   /**
-   * Init PieChart
+   * Init LineChart
    */
+
   initLineChart() {
-    if (this.data.length > 0) {
       this.lineChart = dc.lineChart(this.line.nativeElement);
-      const crossFilter = crossfilter(this.data);
-      const categoryDimension = crossFilter.dimension((data) =>
-      // d3.timeWeek(data.date)
-      data.date
-      );
-      const categoryGroupSum = categoryDimension
-        .group()
-        .reduceSum((data) => data.markdown);
+      const categoryDimension = this.dataService.lineDimension;
+      const categoryGroupSum = this.dataService.lineGroupSum;
 
       this.lineChart
         .width(500)
@@ -75,15 +52,13 @@ export class LineChartComponent implements OnInit, AfterContentInit, AfterViewIn
         .elasticY(true)
         .x(d3.scaleTime())
         .elasticX(true)
-        // .xUnits(d3.timeWeeks)
+        .xUnits(d3.timeWeeks)
         .render();
-    }
   }
 
   initData() {
     this.subs.sink = this.dataService.dataChart$.subscribe((data) => {
-      this.data = data;
-      // console.log(this.data);
+      this.lineChart.redraw();
     });
   }
 
