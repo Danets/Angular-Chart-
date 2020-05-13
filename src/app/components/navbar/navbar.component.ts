@@ -12,12 +12,16 @@ export class NavbarComponent implements OnInit {
   controls = ["markdown", "revenues", "margin"];
   selected$: Observable<string>;
 
-  dataList: IDataChart[];
+  selectedCategories$: Observable<Array<string>>;
+  selectedDateRange$: Observable<Array<string>>;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
     this.selected$ = this.dataService.selectedControl$;
+
+    this.selectedCategories$ = this.dataService.filters$;
+    this.selectedDateRange$ = this.dataService.dateRange$;
   }
 
   onChange(files: IDataChart[]) {
@@ -36,7 +40,7 @@ export class NavbarComponent implements OnInit {
       });
     }
   }
-       
+
   changeOption(value: string) {
     this.dataService.selectControl(value);
   }

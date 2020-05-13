@@ -5,7 +5,10 @@
 
 <mat-form-field>
   <mat-label>Select Control</mat-label>
-  <mat-select [value]="selected$ | async" (selectionChange)="changeOption($event.value)">
+  <mat-select
+    [value]="selected$ | async"
+    (selectionChange)="changeOption($event.value)"
+  >
     <mat-option *ngFor="let ctrl of controls" [value]="ctrl">
       {{ ctrl }}
     </mat-option>
@@ -21,24 +24,12 @@
   multiple
 />
 
-<button mat-raised-button color="primary" (click)="resetAll()">Reset all</button>
+<button mat-raised-button color="primary" (click)="resetAll()">
+  Reset all
+</button>
 
+<h1>selectedCategories:</h1>
+<p *ngFor="let category of selectedCategories$ | async">{{ category }}</p>
 
-<!-- <div>
-  <table border="">
-    <thead>
-      <tr>
-        <th>markdown</th>
-        <th>revenues</th>
-        <th>margin</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let record of dataList">
-        <td>{{ record.markdown }}</td>
-        <td>{{ record.revenues }}</td>
-        <td>{{ record.margin }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div> -->
+<h1>selectedDateRange:</h1>
+<p *ngFor="let date of selectedDateRange$ | async">{{ date }}</p>

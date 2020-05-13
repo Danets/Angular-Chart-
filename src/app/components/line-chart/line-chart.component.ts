@@ -6,7 +6,6 @@ import {
   ElementRef,
 } from "@angular/core";
 import { DataService } from "../../data.service";
-import { IDataChart } from "../../models/data-chart";
 
 import { SubSink } from "subsink";
 
@@ -26,7 +25,7 @@ export class LineChartComponent implements AfterViewInit, OnDestroy {
   private subs = new SubSink();
 
   constructor(private dataService: DataService) {}
-  
+
   ngAfterViewInit(): void {
     this.initLineChart();
     this.initData();
@@ -38,22 +37,29 @@ export class LineChartComponent implements AfterViewInit, OnDestroy {
    */
 
   initLineChart() {
-      this.lineChart = dc.lineChart(this.line.nativeElement);
-      const categoryDimension = this.dataService.lineDimension;
-      const categoryGroupSum = this.dataService.lineGroupSum;
+    this.lineChart = dc.lineChart(this.line.nativeElement);
+    const categoryDimension = this.dataService.lineDimension;
+    const categoryGroupSum = this.dataService.lineGroupSum;
 
-      this.lineChart
-        .width(500)
-        .height(400)
-        .margins({ top: 10, right: 10, bottom: 20, left: 100 })
-        .dimension(categoryDimension)
-        .group(categoryGroupSum)
-        .transitionDuration(500)
-        .elasticY(true)
-        .x(d3.scaleTime())
-        .elasticX(true)
-        .xUnits(d3.timeWeeks)
-        .render();
+    this.lineChart
+      .width(500)
+      .height(400)
+      .margins({ top: 10, right: 10, bottom: 20, left: 100 })
+      .dimension(categoryDimension)
+      .group(categoryGroupSum)
+      .transitionDuration(500)
+      .elasticY(true)
+      .x(d3.scaleTime())
+      .elasticX(true)
+      .xUnits(d3.timeWeeks)
+      .on("filtered", (chart) => {
+        const filters = chart.filters();
+        chart.selectAll(".selection").classed("selected", (d) => {
+          return filters.includes(d);
+        });
+        this.dataService.setDateRange(filters);
+      })
+      .render();
   }
 
   initData() {

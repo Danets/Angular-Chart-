@@ -10,6 +10,7 @@ import { DataService } from "../../data.service";
 import { SubSink } from "subsink";
 
 import * as dc from "dc";
+import * as d3 from "d3";
 import { PieChart } from "dc";
 
 @Component({
@@ -20,8 +21,6 @@ import { PieChart } from "dc";
 export class PieChartComponent implements AfterViewInit, OnDestroy {
   @ViewChild("pie") pie: ElementRef;
   private pieChart: PieChart;
-
-  selectedCategories = [];
 
   private subs = new SubSink();
 
@@ -48,11 +47,13 @@ export class PieChartComponent implements AfterViewInit, OnDestroy {
       .dimension(categoryDimension)
       .group(categoryGroupSum)
       .legend(dc.legend())
-      //   .on('filtered', function(chart) {
-      //     chart.filter(null)
-      //         .filter([chart.filters()])
-      //         .redrawGroup();
-      // })
+      .on("filtered", (chart) => {
+        const filters = chart.filters();
+        chart.selectAll(".pie-slice").classed("selected", (d) => {
+          return filters.includes(d);
+        });
+        this.dataService.setFilters(filters);
+      })
       .render();
   }
 

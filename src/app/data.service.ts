@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Subject, Observable } from "rxjs";
 import { IDataChart } from "./models/data-chart";
 
 import * as dc from "dc";
@@ -12,8 +12,10 @@ import { Crossfilter } from "crossfilter2";
 })
 export class DataService {
   private crossFilter: Crossfilter<IDataChart> = crossfilter();
+
   pieDimension = this.crossFilter.dimension((data) => data.item_category);
   pieGroupSum = this.pieDimension.group().reduceSum((data) => data.markdown);
+  
   lineDimension = this.crossFilter.dimension((data) => d3.timeWeek(data.date));
   lineGroupSum = this.lineDimension.group().reduceSum((data) => data.markdown);
 
@@ -28,11 +30,30 @@ export class DataService {
     this.dataSubject.next(data);
   }
 
+  // HERE IS CONTROLS
   selectedSubject: BehaviorSubject<string> = new BehaviorSubject("markdown");
   selectedControl$: Observable<string> = this.selectedSubject.asObservable();
 
   selectControl(control: string): void {
     this.selectedSubject.next(control);
+  }
+
+  // HERE IS FILTERS FOR PIECHART
+
+  filtersSubject: BehaviorSubject<Array<string>> = new BehaviorSubject([""]);
+  filters$: Observable<Array<string>> = this.filtersSubject.asObservable();
+
+  setFilters(filters: Array<string>): void {
+    this.filtersSubject.next(filters);
+  }
+
+  // HERE IS FILTERS FOR LINECHART
+
+  dateRangeSubject: BehaviorSubject<Array<string>> = new BehaviorSubject([""]);
+  dateRange$: Observable<Array<string>> = this.dateRangeSubject.asObservable();
+
+  setDateRange(dateRange: Array<string>): void {
+    this.dateRangeSubject.next(dateRange);
   }
 
   constructor() {
@@ -47,6 +68,7 @@ export class DataService {
     });
   }
 
+  // RESET FILTERS
   resetFilters() {
     this.pieDimension.filterAll();
     this.lineDimension.filterAll();
