@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PieChartComponent } from './pie-chart.component';
+import { DataService } from "../../data.service";
 
 describe('PieChartComponent', () => {
   let component: PieChartComponent;
@@ -8,7 +9,8 @@ describe('PieChartComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PieChartComponent ]
+      declarations: [ PieChartComponent ],
+      providers: [ DataService ]
     })
     .compileComponents();
   }));
